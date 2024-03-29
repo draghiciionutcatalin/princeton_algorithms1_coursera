@@ -24,7 +24,7 @@ public class UnorderedMaxPQCourse<Key extends Comparable<Key>> {
         int max = 0;
         for (int i = 1; i < N; i++)
             if (less(max, i)) max = i;
-        exchange(max, N - 1);
+        exchange(pq, max, N - 1);
         return pq[--N];
     }
 
@@ -34,7 +34,7 @@ public class UnorderedMaxPQCourse<Key extends Comparable<Key>> {
         return false;
     }
 
-    public static void exchange(Comparable[] a, int i, int j) {
+    public void exchange(Comparable[] a, int i, int j) {
         Comparable swap = a[i];
         a[i] = a[j];
         a[j] = swap;

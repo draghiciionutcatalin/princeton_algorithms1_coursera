@@ -20,7 +20,9 @@ public class HeapSortCourse {
 
     private static void sink(Comparable[] a, int k, int N) { /* as before */ }
 
-    private static boolean less(Comparable[] a, int i, int j) { /* as before */ }
+    private static boolean less(Comparable[] a, int i, int j) { /* as before */
+        return true;
+    }
 
     private static void exch(Comparable[] a, int i, int j) { /* as before */ }
 
