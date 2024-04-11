@@ -49,7 +49,9 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		return null;
 	}
 
-	public void delete(Key key) { /* see next slides */ }
+	public void delete(Key key) {
+		/* see next slides */
+	}
 
 	public Iterable<Key> iterator() { /* see next slides */
 		return null;
