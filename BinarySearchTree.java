@@ -1,3 +1,5 @@
+import java.util.Queue;
+
 public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
 	private class Node {
@@ -40,10 +42,29 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 	}
 
 	private int size(Node x) {
+		/*if (x == null) {
+			return 0;
+		}
+		return x.count;*/
+		return (x == null) ? 0 : x.count;
+	}
+
+	public int rank(Key key) {
+		return rank(key, root);
+	}
+
+	private int rank(Key key, Node x) {
 		if (x == null) {
 			return 0;
 		}
-		return x.count;
+		int cmp = key.compareTo(x.key);
+		if (cmp < 0) {
+			return rank(key, x.left);
+		} else if (cmp > 0) {
+			return 1 + size(x.left) + rank(key, x.right);
+		} else if (cmp == 0) {
+			return size(x.left);
+		}
 	}
 
 	public Value get(Key key) {
@@ -67,10 +88,11 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
 	public Key floor(Key key) {
 		Node x = floor(root, key);
-		if (x == null) {
+		/*if (x == null) {
 			return null;
 		}
-		return x.key;
+		return x.key;*/
+		return (x == null) ? null : x.key;
 	}
 
 	private Node floor(Node x, Key key) {
