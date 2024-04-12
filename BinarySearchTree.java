@@ -5,6 +5,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		private Key key;
 		private Value val;
 		private Node left, right;
+		private int count;
 
 		public Node(Key key, Value val) {
 			this.key = key;
@@ -30,10 +31,22 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		} else if (cmp == 0) {
 			x.val = val;
 		}
+		x.count = 1 + size(x.left) + size(x.right);
 		return x;
 	}
 
-	public Value get(Key key) { /* see next slides */
+	public int size() {
+		return size(root);
+	}
+
+	private int size(Node x) {
+		if (x == null) {
+			return 0;
+		}
+		return x.count;
+	}
+
+	public Value get(Key key) {
 		Node x = root;
 		while (x != null) {
 			int cmp = key.compareTo(x.key);
