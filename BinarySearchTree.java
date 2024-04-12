@@ -14,7 +14,6 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
 	private Node root;
 
-	/* see previous slide */
 	public void put(Key key, Value val) {
 		root = put(root, key, val);
 	}
@@ -51,6 +50,33 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
 	public void delete(Key key) {
 		/* see next slides */
+	}
+
+	public Key floor(Key key) {
+		Node x = floor(root, key);
+		if (x == null) {
+			return null;
+		}
+		return x.key;
+	}
+
+	private Node floor(Node x, Key key) {
+		if (x == null) {
+			return null;
+		}
+		int cmp = key.compareTo(x.key);
+		if (cmp == 0) {
+			return x;
+		}
+		if (cmp < 0) {
+			return floor(x.left, key);
+		}
+		Node t = floor(x.right, key);
+		if (t != null) {
+			return t;
+		} else {
+			return x;
+		}
 	}
 
 	public Iterable<Key> iterator() { /* see next slides */
