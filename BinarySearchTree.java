@@ -65,6 +65,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		} else if (cmp == 0) {
 			return size(x.left);
 		}
+		return 0;
 	}
 
 	public Value get(Key key) {
@@ -83,7 +84,45 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 	}
 
 	public void delete(Key key) {
-		/* see next slides */
+		root = delete(root, key);
+	}
+
+	private Node delete(Node x, Key key) {
+		if (x == null) {
+			return null;
+		}
+		int cmp = key.compareTo(x.key);
+		if (cmp < 0) {
+			x.left = delete(x.left, key);
+		} else if (cmp > 0) {
+			x.right = delete(x.right, key);
+		} else {
+			if (x.right == null) {
+				return x.left;
+			}
+			if (x.left == null) {
+				return x.right;
+			}
+			Node t = x;
+			//x = min(t.right);
+			x.right = deleteMin(t.right);
+			x.left = t.left;
+		}
+		x.count = size(x.left) + size(x.right) + 1;
+		return x;
+	}
+
+	public void deleteMin() {
+		root = deleteMin(root);
+	}
+
+	private Node deleteMin(Node x) {
+		if (x.left == null) {
+			return x.right;
+		}
+		x.left = deleteMin(x.left);
+		x.count = 1 + size(x.left) + size(x.right);
+		return x;
 	}
 
 	public Key floor(Key key) {
@@ -115,7 +154,19 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 	}
 
 	public Iterable<Key> iterator() { /* see next slides */
-		return null;
+
+		Queue<Key> q = null;//new Queue<Key>();
+		inorder(root, q);
+		return q;
+	}
+
+	private void inorder(Node x, Queue<Key> q) {
+		if (x == null) {
+			return;
+		}
+		inorder(x.left, q);
+		//q.enqueue(x.key);
+		inorder(x.right, q);
 	}
 
 }
