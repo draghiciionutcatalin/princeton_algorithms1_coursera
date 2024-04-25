@@ -2,12 +2,16 @@ import java.util.Queue;
 
 public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
+	private static final boolean RED = true;
+	private static final boolean BLACK = false;
+
 	private class Node {
 
 		private Key key;
 		private Value val;
 		private Node left, right;
 		private int count;
+		private boolean color;
 
 		public Node(Key key, Value val) {
 			this.key = key;
@@ -151,6 +155,23 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		} else {
 			return x;
 		}
+	}
+
+	private boolean isRed(Node x) {
+		if (x == null) {
+			return false;
+		}
+		return x.color == RED;
+	}
+
+	private Node rotateLeft(Node h) {
+		assert isRed(h.right);
+		Node x = h.right;
+		h.right = x.left;
+		x.left = h;
+		x.color = h.color;
+		h.color = RED;
+		return x;
 	}
 
 	public Iterable<Key> iterator() { /* see next slides */
