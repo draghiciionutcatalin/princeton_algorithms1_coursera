@@ -174,6 +174,25 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		return x;
 	}
 
+	private Node rotateRight(Node h) {
+		assert isRed(h.left);
+		Node x = h.left;
+		h.left = x.right;
+		x.right = h;
+		x.color = h.color;
+		h.color = RED;
+		return x;
+	}
+
+	private void flipColors(Node h) {
+		assert !isRed(h);
+		assert isRed(h.left);
+		assert isRed(h.right);
+		h.color = RED;
+		h.left.color = BLACK;
+		h.right.color = BLACK;
+	}
+
 	public Iterable<Key> iterator() { /* see next slides */
 
 		Queue<Key> q = null;//new Queue<Key>();
