@@ -65,16 +65,16 @@ public class KdTree {
             size++;
             // Compare by X-coordinate
             // new node location is on right / on left from parent
-            if (((level - 1) % 2) == 0) if (p.x() < parent.p.x()) parent.lb = new Node(p,
-                                                                                       new RectHV(
-                                                                                               parent.rect.xmin(),
-                                                                                               parent.rect.ymin(),
-                                                                                               parent.p.x(),
-                                                                                               parent.rect.ymax()),
-                                                                                       null, null);
-            else parent.rt = new Node(p, new RectHV(parent.p.x(), parent.rect.ymin(),
-                                                    parent.rect.xmax(), parent.rect.ymax()), null,
-                                      null);
+            if (((level - 1) % 2) == 0)
+                if (p.x() < parent.p.x()) parent.lb = new Node(p, new RectHV(parent.rect.xmin(),
+                                                                             parent.rect.ymin(),
+                                                                             parent.p.x(),
+                                                                             parent.rect.ymax()),
+                                                               null, null);
+                else parent.rt = new Node(p, new RectHV(parent.p.x(), parent.rect.ymin(),
+                                                        parent.rect.xmax(), parent.rect.ymax()),
+                                          null,
+                                          null);
                 // Compare by Y-coordinate
                 // new node location is on top / on bottom from parent
             else if (p.y() < parent.p.y()) parent.lb = new Node(p, new RectHV(parent.rect.xmin(),
@@ -86,7 +86,6 @@ public class KdTree {
                                                     parent.rect.xmax(), parent.rect.ymax()), null,
                                       null);
         }
-
     }
 
     public boolean contains(Point2D p) {
@@ -106,7 +105,7 @@ public class KdTree {
                               double ymax) {
         if (node == null) return;
 
-        StdDraw.setPenRadius(0.001);
+        // StdDraw.setPenRadius(0.001);
         // OY vertical line, x fixed
         if (dir) {
             StdDraw.setPenColor(StdDraw.RED);
@@ -123,11 +122,11 @@ public class KdTree {
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.setPenRadius(0.01);
         node.p.draw();
-		/* if (dir)
-			StdDraw.textRight(node.p.x() + 0.05, node.p.y(), node.name);
-		else
-			StdDraw.textRight(node.p.x(), node.p.y() - 0.05, node.name);
-		*/
+        /* if (dir)
+            StdDraw.textRight(node.p.x() + 0.05, node.p.y(), node.name);
+            else
+            StdDraw.textRight(node.p.x(), node.p.y() - 0.05, node.name);
+            */
     }
 
     public void draw() {
@@ -135,7 +134,7 @@ public class KdTree {
         Node node = root;
         boolean dir = true;
         StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setPenRadius(0.001);
+        // StdDraw.setPenRadius(0.001);
         StdDraw.line(0, 0, 0, 1);
         StdDraw.line(0, 0, 1, 0);
         StdDraw.line(1, 1, 0, 1);
@@ -203,7 +202,7 @@ public class KdTree {
     public static void main(String[] args) {
         KdTree kd = new KdTree();
         Point2D p1 = new Point2D(0.5, 0.6);
-        Point2D p2;// = new Point2D(0.2, 0.8);
+        Point2D p2; // = new Point2D(0.2, 0.8);
         if (args.length != 0) {
             In in = new In(args[0]);
             double x, y;
@@ -225,18 +224,6 @@ public class KdTree {
             kd.insert(p2);
             Node n = kd.getNode(p2);
         }
-
-        /* if (n != null)
-            kd.fillRect(n.rect, StdDraw.YELLOW);
-
-        StdOut.println(''Contains " + p1.toString() + ": " + kd.contains(p1));
-
-        RectHV r = new RectHV(0.2, 0.2, 0.6, 0.6);
-        for (Point2D it : kd.range(r))
-            StdOut.println("IN: " + it.toString());
-
-        kd.fillRect(r, StdDraw.GRAY);
-        */
 
         StdOut.println("Nearest " + p1.toString() + " : " + kd.nearest(p1).toString());
         kd.draw();
