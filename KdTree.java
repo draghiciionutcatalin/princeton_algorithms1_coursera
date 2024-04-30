@@ -14,7 +14,7 @@ import edu.princeton.cs.algs4.StdRandom;
 public class KdTree {
 
     private static class Node {
-        private static int id = 0;
+        private int id = 0;
         private Point2D p;
         private RectHV rect;
         private Node lb;
@@ -35,7 +35,7 @@ public class KdTree {
     private int size;
 
     public KdTree() {
-        Node root = null;
+        Node root2 = null;
         size = 0;
     }
 
@@ -106,7 +106,7 @@ public class KdTree {
                               double ymax) {
         if (node == null) return;
 
-        StdDraw.setPenRadius(.001);
+        StdDraw.setPenRadius(0.001);
         // OY vertical line, x fixed
         if (dir) {
             StdDraw.setPenColor(StdDraw.RED);
@@ -121,14 +121,13 @@ public class KdTree {
             internalDraw(node.rt, !dir, xmin, xmax, node.p.y(), ymax);
         }
         StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setPenRadius(.01);
+        StdDraw.setPenRadius(0.01);
         node.p.draw();
-		/*
-		if (dir)
+		/* if (dir)
 			StdDraw.textRight(node.p.x() + 0.05, node.p.y(), node.name);
 		else
 			StdDraw.textRight(node.p.x(), node.p.y() - 0.05, node.name);
-			*/
+		*/
     }
 
     public void draw() {
@@ -136,7 +135,7 @@ public class KdTree {
         Node node = root;
         boolean dir = true;
         StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setPenRadius(.001);
+        StdDraw.setPenRadius(0.001);
         StdDraw.line(0, 0, 0, 1);
         StdDraw.line(0, 0, 1, 0);
         StdDraw.line(1, 1, 0, 1);
@@ -161,17 +160,17 @@ public class KdTree {
     }
 
     private Node nearestRec(Point2D p, Node node, double dist) {
-        if (node.rect.distanceTo(p) > dist) return node;
+        if (node.rect.distanceSquaredTo(p) > dist) return node;
         Node min = node;
-        if (node.rect.distanceTo(p) < dist && dist != 0) {
-            dist = node.p.distanceTo(p);
+        if (node.rect.distanceSquaredTo(p) < dist && dist != 0) {
+            dist = node.p.distanceSquaredTo(p);
             min = node;
         }
-        if (node.lb != null && node.lb.rect.distanceTo(p) < dist) {
+        if (node.lb != null && node.lb.rect.distanceSquaredTo(p) < dist) {
             min = nearestRec(p, node.lb, dist);
-            dist = node.p.distanceTo(p);
+            dist = node.p.distanceSquaredTo(p);
         }
-        if (node.rt != null && node.rt.rect.distanceTo(p) < dist)
+        if (node.rt != null && node.rt.rect.distanceSquaredTo(p) < dist)
             min = nearestRec(p, node.rt, dist);
         return min;
     }
@@ -179,7 +178,7 @@ public class KdTree {
     public Point2D nearest(Point2D p) {
         if (isEmpty()) return null;
         return root.p;
-        // return nearestRec(p, root, root.p.distanceTo(p)).p;
+        // return nearestRec(p, root, root.p.distanceSquaredTo(p)).p;
     }
 
     private Node getNode(Point2D p) {
@@ -195,16 +194,15 @@ public class KdTree {
         return null;
     }
 
-    /*private void fillRect(RectHV rect, Color color) {
+    /* private void fillRect(RectHV rect, Color color) {
         StdDraw.setPenColor(color);
         StdDraw.filledRectangle((rect.xmin() + rect.xmax()) / 2, (rect.ymin() + rect.ymax()) / 2,
                                 (rect.xmax() - rect.xmin()) / 2, (rect.ymax() - rect.ymin()) / 2);
-    }*/
-
+    } */
 
     public static void main(String[] args) {
         KdTree kd = new KdTree();
-        Point2D p1 = new Point2D(.5, .6);
+        Point2D p1 = new Point2D(0.5, 0.6);
         Point2D p2;// = new Point2D(0.2, 0.8);
         if (args.length != 0) {
             In in = new In(args[0]);
@@ -228,17 +226,17 @@ public class KdTree {
             Node n = kd.getNode(p2);
         }
 
-        /*if (n != null)
+        /* if (n != null)
             kd.fillRect(n.rect, StdDraw.YELLOW);
 
-        StdOut.println("Contains " + p1.toString() + ": " + kd.contains(p1));
+        StdOut.println(''Contains " + p1.toString() + ": " + kd.contains(p1));
 
         RectHV r = new RectHV(0.2, 0.2, 0.6, 0.6);
         for (Point2D it : kd.range(r))
             StdOut.println("IN: " + it.toString());
 
-        kd.fillRect(r, StdDraw.GRAY);*/
-
+        kd.fillRect(r, StdDraw.GRAY);
+        */
 
         StdOut.println("Nearest " + p1.toString() + " : " + kd.nearest(p1).toString());
         kd.draw();
