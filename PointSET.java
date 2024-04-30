@@ -13,13 +13,13 @@ import edu.princeton.cs.algs4.StdRandom;
 
 public class PointSET {
 
-    private RedBlackBST<Double, Point2D> rbtree;
+    private RedBlackBST<Double, Point2D> rbTree;
     private SET<Point2D> pset;
     private int size;
 
     public PointSET() {
         pset = new SET<Point2D>();
-        rbtree = new RedBlackBST<Double, Point2D>();
+        rbTree = new RedBlackBST<Double, Point2D>();
         size = 0;
     } // construct an empty set of points
 
@@ -34,7 +34,7 @@ public class PointSET {
     public void insert(Point2D p) {
         if (pset.contains(p)) return;
         pset.add(p);
-        rbtree.put(p.x(), p);
+        rbTree.put(p.x(), p);
         size++;
     } // add the point to the set (if it is not already in the set)
 
@@ -47,7 +47,7 @@ public class PointSET {
         StdDraw.setPenRadius(0.01);
         for (Point2D p : pset)
             p.draw();
-        StdDraw.show(0);
+        StdDraw.show();
     } // draw all points to standard draw
 
     public Iterable<Point2D> range(RectHV rect) {
@@ -61,7 +61,7 @@ public class PointSET {
 
     public Point2D nearest(Point2D p) {
         Point2D nearest = p;
-        Double dist = Double.MAX_VALUE;
+        double dist = Double.POSITIVE_INFINITY;
         for (Point2D it : pset)
             if (p.distanceTo(it) < dist && !it.equals(p)) {
                 nearest = it;
@@ -76,11 +76,11 @@ public class PointSET {
         RectHV rect = new RectHV(0.2, 0.2, 0.6, 0.6);
         pset.insert(p);
         for (int i = 0; i < 1000; i++)
-            pset.insert(new Point2D(StdRandom.uniform(), StdRandom.uniform()));
+            pset.insert(new Point2D(StdRandom.uniformDouble(), StdRandom.uniformDouble()));
         rect.draw();
         StdDraw.circle(p.x(), p.y(), p.distanceTo(pset.nearest(p)));
         pset.draw();
-        StdDraw.show(0);
+        StdDraw.show();
         StdOut.println("Nearest to " + p.toString() + " = " + pset.nearest(p));
         for (Point2D point : pset.range(rect))
             StdOut.println("In Range: " + point.toString());
