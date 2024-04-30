@@ -44,7 +44,7 @@ public class PointSET {
 
     public void draw() {
         StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setPenRadius(0.01);
+        // StdDraw.setPenRadius(0.01);
         for (Point2D p : pset)
             p.draw();
         StdDraw.show();
@@ -63,26 +63,26 @@ public class PointSET {
         Point2D nearest = p;
         double dist = Double.POSITIVE_INFINITY;
         for (Point2D it : pset)
-            if (p.distanceTo(it) < dist && !it.equals(p)) {
+            if (p.distanceSquaredTo(it) < dist && !it.equals(p)) {
                 nearest = it;
-                dist = p.distanceTo(it);
+                dist = p.distanceSquaredTo(it);
             }
         return nearest;
-    } // a nearest neighbor in the set to point p; null if the set is empty
+    } // a nearest neighbor in the set to point p; null if the set is empty.
 
     public static void main(String[] args) {
-        PointSET pset = new PointSET();
+        PointSET pSet = new PointSET();
         Point2D p = new Point2D(0.2, 0.3);
         RectHV rect = new RectHV(0.2, 0.2, 0.6, 0.6);
-        pset.insert(p);
+        pSet.insert(p);
         for (int i = 0; i < 1000; i++)
-            pset.insert(new Point2D(StdRandom.uniformDouble(), StdRandom.uniformDouble()));
+            pSet.insert(new Point2D(StdRandom.uniformDouble(), StdRandom.uniformDouble()));
         rect.draw();
-        StdDraw.circle(p.x(), p.y(), p.distanceTo(pset.nearest(p)));
-        pset.draw();
+        StdDraw.circle(p.x(), p.y(), p.distanceSquaredTo(pSet.nearest(p)));
+        pSet.draw();
         StdDraw.show();
-        StdOut.println("Nearest to " + p.toString() + " = " + pset.nearest(p));
-        for (Point2D point : pset.range(rect))
+        StdOut.println("Nearest to " + p.toString() + " = " + pSet.nearest(p));
+        for (Point2D point : pSet.range(rect))
             StdOut.println("In Range: " + point.toString());
     }               // unit testing of the methods (optional)
 
