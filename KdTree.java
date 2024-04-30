@@ -1,6 +1,6 @@
 /* *****************************************************************************
  *  Name:              Ionut Draghici
- *  Created:           30 April 2024 11:09
+ *  Created:           30 April 2024 13:12
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.Point2D;
@@ -9,357 +9,164 @@ import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.LinkedList;
+import java.util.List;
 
-/** PointSET represents a set of 2d points in a unit square, using a 2d-tree. */
 public class KdTree {
+    private static class Node {
+        private final Point2D p;      // the point
+        private final RectHV rect;    // the axis-aligned rectangle corresponding to this node
+        private final boolean isVertical; // indicates if the node splits vertically or horizontally
+        private Node lb;        // the left/bottom subtree
+        private Node rt;        // the right/top subtree
 
-    private static final boolean VERTICAL = true;
-    private static final boolean HORIZONTAL = false;
-
-    /** Node class to build the tree */
-    private class Node {
-        Point2D value;
-        Node left;
-        Node right;
-        boolean division;
-
-        Node(Point2D p) {
-            value = p;
-            left = null;
-            right = null;
+        public Node(Point2D p, RectHV rect, boolean isVertical) {
+            this.p = p;
+            this.rect = rect;
+            this.isVertical = isVertical;
         }
     }
 
     private Node root;
-    private LinkedList<Point2D> contained;
-    private Point2D champion;
-    private Point2D comparison;
     private int size;
 
-    /** Constructor, creates a SET of points */
     public KdTree() {
         root = null;
+        size = 0;
     }
 
-    /** Returns true when there are no points in the set */
     public boolean isEmpty() {
-        return size() == 0;
+        return size == 0;
     }
 
-    /** Returns the number of points in the set */
     public int size() {
-        if (root == null) {
-            return 0;
-        }
-        else {
-            return getCount();
-        }
-    }
-
-    private int getCount() {
         return size;
     }
 
-    /** Used to insert a new point into the set */
     public void insert(Point2D p) {
-        Node newPoint = new Node(p);
-        Node currPos = root;
+        if (p == null) throw new IllegalArgumentException("Point cannot be null");
+        root = insert(root, p, true, 0, 0, 1, 1);
+    }
 
-        if (root == null) {
-            newPoint.division = VERTICAL;
-            root = newPoint;
+    private Node insert(Node node, Point2D p, boolean isVertical, double xmin, double ymin,
+                        double xmax, double ymax) {
+        if (node == null) {
             size++;
-            return;
+            return new Node(p, new RectHV(xmin, ymin, xmax, ymax), isVertical);
         }
 
-        while (true) {
-            if (p.equals(currPos.value)) {
-                return;
-            }
+        if (node.p.equals(p)) return node;
 
-            // Use first bit to determine if level is even or odd
-            if (currPos.division == VERTICAL) {
-                // Slice vertically
-                if (p.x() < currPos.value.x()) {
-                    if (currPos.left == null) {
-                        newPoint.division = HORIZONTAL;
-                        currPos.left = newPoint;
-                        size++;
-                        return;
-                    }
-                    else {
-                        currPos = currPos.left;
-                    }
-                }
-                else {
-                    if (currPos.right == null) {
-                        newPoint.division = HORIZONTAL;
-                        currPos.right = newPoint;
-                        size++;
-                        return;
-                    }
-                    else {
-                        currPos = currPos.right;
-                    }
-                }
-
-            }
-            else {
-                // Slice horizontally
-                if (p.y() < currPos.value.y()) {
-                    if (currPos.left == null) {
-                        newPoint.division = VERTICAL;
-                        currPos.left = newPoint;
-                        size++;
-                        return;
-                    }
-                    else {
-                        currPos = currPos.left;
-                    }
-                }
-                else {
-                    if (currPos.right == null) {
-                        newPoint.division = VERTICAL;
-                        currPos.right = newPoint;
-                        size++;
-                        return;
-                    }
-                    else {
-                        currPos = currPos.right;
-                    }
-                }
-            }
-        }
-    }
-
-    /** Returns true if the point is contained within the set */
-    public boolean contains(Point2D p) {
-        Node currPos = root;
-
-        while (currPos != null) {
-            if (p.equals(currPos.value)) {
-                return true;
-            }
-
-            // Use first bit to determine if level is even or odd
-            if (currPos.division == VERTICAL) {
-                // Vertical slice
-                if (p.x() < currPos.value.x()) {
-                    currPos = currPos.left;
-                }
-                else {
-                    currPos = currPos.right;
-                }
-
-            }
-            else {
-                // Horizontal slice
-                if (p.y() < currPos.value.y()) {
-                    currPos = currPos.left;
-                }
-                else {
-                    currPos = currPos.right;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /** Uses StdDraw to draw the points in the set on screen. */
-    public void draw() {
-        if (root != null) {
-            drawNodes(root);
-        }
-    }
-
-    private void drawNodes(Node node) {
-        node.value.draw();
-
-        if (node.right != null) {
-            drawNodes(node.right);
-        }
-
-        if (node.left != null) {
-            drawNodes(node.left);
-        }
-    }
-
-    /** Returns a set of points held within a rectangle */
-    public Iterable<Point2D> range(RectHV rect) {
-        contained = new LinkedList<Point2D>();
-
-        checkPointsInRange(root, rect);
-
-        return contained;
-    }
-
-    private void checkPointsInRange(Node node, RectHV rect) {
-        if (node == null) return;
-
-        if (node.division == VERTICAL) {
-            if (node.value.x() > rect.xmax()) {
-                // go to the left
-                checkPointsInRange(node.left, rect);
-
-            }
-            else if (node.value.x() < rect.xmin()) {
-                // go to the right
-                checkPointsInRange(node.right, rect);
-
-            }
-            else {
-                // go both ways and check self
-                checkPointsInRange(node.left, rect);
-                checkPointsInRange(node.right, rect);
-
-                if (rect.contains(node.value)) {
-                    contained.add(node.value);
-                }
-            }
-
+        if (node.isVertical) {
+            if (p.x() < node.p.x())
+                node.lb = insert(node.lb, p, !isVertical, xmin, ymin, node.p.x(), ymax);
+            else node.rt = insert(node.rt, p, !isVertical, node.p.x(), ymin, xmax, ymax);
         }
         else {
-            if (node.value.y() > rect.ymax()) {
-                // go to the left
-                checkPointsInRange(node.left, rect);
+            if (p.y() < node.p.y())
+                node.lb = insert(node.lb, p, !isVertical, xmin, ymin, xmax, node.p.y());
+            else node.rt = insert(node.rt, p, !isVertical, xmin, node.p.y(), xmax, ymax);
+        }
 
-            }
-            else if (node.value.y() < rect.ymin()) {
-                // go to the right
-                checkPointsInRange(node.right, rect);
+        return node;
+    }
 
-            }
-            else {
-                // go both ways and check self
-                checkPointsInRange(node.left, rect);
-                checkPointsInRange(node.right, rect);
+    public boolean contains(Point2D p) {
+        if (p == null) throw new IllegalArgumentException("Point cannot be null");
+        return contains(root, p);
+    }
 
-                if (rect.contains(node.value)) {
-                    contained.add(node.value);
-                }
-            }
+    private boolean contains(Node node, Point2D p) {
+        if (node == null) return false;
+        if (node.p.equals(p)) return true;
+
+        if (node.isVertical) {
+            if (p.x() < node.p.x()) return contains(node.lb, p);
+            else return contains(node.rt, p);
+        }
+        else {
+            if (p.y() < node.p.y()) return contains(node.lb, p);
+            else return contains(node.rt, p);
         }
     }
 
-    /** Returns the nearest point to the provided Point2D */
-    public Point2D nearest(Point2D p) {
-        champion = null;
-        comparison = p;
+    public void draw() {
+        draw(root);
+    }
 
-        checkNearest(root);
+    private void draw(Node node) {
+        if (node == null) return;
+
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(0.01);
+        node.p.draw();
+
+        StdDraw.setPenRadius();
+        if (node.isVertical) {
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.line(node.p.x(), node.rect.ymin(), node.p.x(), node.rect.ymax());
+        }
+        else {
+            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.line(node.rect.xmin(), node.p.y(), node.rect.xmax(), node.p.y());
+        }
+
+        draw(node.lb);
+        draw(node.rt);
+    }
+
+    public Iterable<Point2D> range(RectHV rect) {
+        if (rect == null) throw new IllegalArgumentException("Rectangle cannot be null");
+        List<Point2D> pointsInRange = new LinkedList<>();
+        range(root, rect, pointsInRange);
+        return pointsInRange;
+    }
+
+    private void range(Node node, RectHV rect, List<Point2D> pointsInRange) {
+        if (node == null) return;
+        if (rect.contains(node.p)) pointsInRange.add(node.p);
+
+        if (node.lb != null && rect.intersects(node.lb.rect)) range(node.lb, rect, pointsInRange);
+        if (node.rt != null && rect.intersects(node.rt.rect)) range(node.rt, rect, pointsInRange);
+    }
+
+    public Point2D nearest(Point2D p) {
+        if (p == null) throw new IllegalArgumentException("Point cannot be null");
+        if (isEmpty()) return null;
+        return nearest(root, p, root.p);
+    }
+
+    private Point2D nearest(Node node, Point2D queryPoint, Point2D champion) {
+        if (node == null) return champion;
+        if (node.rect.distanceSquaredTo(queryPoint) >= champion.distanceSquaredTo(queryPoint))
+            return champion;
+
+        if (node.p.distanceSquaredTo(queryPoint) < champion.distanceSquaredTo(queryPoint))
+            champion = node.p;
+
+        Node closerNode = node.lb;
+        Node fartherNode = node.rt;
+
+        if (node.rt != null && node.rt.rect.contains(queryPoint)) {
+            closerNode = node.rt;
+            fartherNode = node.lb;
+        }
+
+        champion = nearest(closerNode, queryPoint, champion);
+        champion = nearest(fartherNode, queryPoint, champion);
 
         return champion;
     }
 
-    private void checkNearest(Node node) {
-        if (node == null) return;
-
-        if (champion == null) {
-            champion = node.value;
-        }
-        else if (comparison.distanceSquaredTo(champion) > comparison.distanceSquaredTo(
-                node.value)) {
-            champion = node.value;
-        }
-
-        if (node.division == VERTICAL) {
-            // If this point is closer than champion, explore both subtrees
-            if (comparison.distanceSquaredTo(champion) > comparison.distanceSquaredTo(node.value)) {
-                if (node.value.x() >= comparison.x()) {
-                    checkNearest(node.left);
-                    checkNearest(node.right);
-
-                }
-                else {
-                    checkNearest(node.right);
-                    checkNearest(node.left);
-                }
-
-                // Otherwise explore the subtree closer to the comparison point
-            }
-            else {
-                if (node.value.x() > comparison.x()) {
-                    checkNearest(node.left);
-
-                }
-                else if (node.value.x() < comparison.x()) {
-                    checkNearest(node.right);
-
-                }
-                else {
-                    checkNearest(node.left);
-                    checkNearest(node.right);
-                }
-            }
-
-        }
-        else {
-            // If this point is closer than champion, explore both subtrees
-            if (comparison.distanceSquaredTo(champion) > comparison.distanceSquaredTo(node.value)) {
-                if (node.value.y() >= comparison.y()) {
-                    checkNearest(node.left);
-                    checkNearest(node.right);
-
-                }
-                else {
-                    checkNearest(node.right);
-                    checkNearest(node.left);
-                }
-
-                // Otherwise explore the subtree closer to the comparison point
-            }
-            else {
-                if (node.value.y() > comparison.y()) {
-                    checkNearest(node.left);
-
-                }
-                else if (node.value.y() < comparison.y()) {
-                    checkNearest(node.right);
-
-                }
-                else {
-                    checkNearest(node.left);
-                    checkNearest(node.right);
-                }
-            }
-        }
-    }
-
     public static void main(String[] args) {
-        KdTree tree = new KdTree();
-        tree.insert(new Point2D(0.4, 0.2));
-        tree.insert(new Point2D(0.2, 0.3));
-        tree.insert(new Point2D(0.7, 0.3));
-        tree.insert(new Point2D(0.4, 0.6));
+        KdTree kdTree = new KdTree();
+        kdTree.insert(new Point2D(0.1, 0.2));
+        kdTree.insert(new Point2D(0.3, 0.4));
+        kdTree.insert(new Point2D(0.5, 0.6));
+        kdTree.insert(new Point2D(0.7, 0.8));
 
-        StdOut.println("Find existing point: " + tree.contains(new Point2D(0.7, 0.3)));
-        StdOut.println("Find non-existent p: " + !tree.contains(new Point2D(0.2, 0.6)));
-        StdOut.println("Count of nodes = 4 : " + tree.size());
-
-        tree.insert(new Point2D(0.3, 0.6));
-
-        StdOut.println("Cannot insert same : " + tree.size());
-
-        StdDraw.setPenRadius(0.01);
-        tree.draw();
-
-        RectHV rect = new RectHV(0.3, 0.1, 0.9, 0.9);
-        StdDraw.setPenColor(StdDraw.BLUE);
-        StdDraw.setPenRadius(0.002);
-        rect.draw();
-
-        for (Point2D point : tree.range(rect)) {
-            StdOut.println(point.toString());
-        }
-
-        StdOut.println();
-
-        StdDraw.setPenColor(StdDraw.RED);
-        StdDraw.setPenRadius(0.01);
-        Point2D comp = new Point2D(0.4, 0.5);
-        comp.draw();
-
-        StdOut.println(tree.nearest(comp).toString());
+        Point2D point = new Point2D(0.25, 0.35);
+        Point2D nearestPoint = kdTree.nearest(point);
+        StdOut.println("Nearest point to " + point + " is " + nearestPoint);
     }
+
 }
